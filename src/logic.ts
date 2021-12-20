@@ -65,7 +65,18 @@ export function move(gameState: GameState): MoveResponse {
 
   // TODO: Step 2 - Don't hit yourself.
   // Use information in gameState to prevent your Battlesnake from colliding with itself.
-  // const mybody = gameState.you.body
+  const mybody = gameState.you.body
+  for (let section of mybody) {
+    if (myHead.x === section.x + 1) {
+      possibleMoves.left = false
+    } else if (myHead.x === section.x - 1) {
+      possibleMoves.right = false
+    } else if (myHead.y === section.y + 1) {
+      possibleMoves.down = false
+    } else if (myHead.y === section.y - 1) {
+      possibleMoves.up = false
+    }
+  }
 
   // TODO: Step 3 - Don't collide with others.
   // Use information in gameState to prevent your Battlesnake from colliding with others.
