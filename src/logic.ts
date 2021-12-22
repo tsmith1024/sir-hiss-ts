@@ -26,6 +26,8 @@ export function move(gameState: GameState): MoveResponse {
 
   possibleMoves = avoidYourself(gameState, possibleMoves)
 
+  possibleMoves = avoidOthers(gameState, possibleMoves)
+
   // let possibleMoves: { [key: string]: boolean } = {
   //   up: true,
   //   down: true,
