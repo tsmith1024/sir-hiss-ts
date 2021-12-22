@@ -1,4 +1,4 @@
-import { avoidWalls, avoidYourself, info, move } from '../src/logic'
+import { avoidWalls, avoidYourself, info, avoidOthers } from '../src/logic'
 import { Battlesnake, Coord, GameState, MoveResponse } from '../src/types';
 
 const TEST_BOARD_WIDTH = 11
@@ -62,23 +62,7 @@ describe('Battlesnake API Version', () => {
   })
 })
 
-describe('Battlesnake Moves', () => {
-  //   it('should never move into its own neck', () => {
-  //     // Arrange
-  //     const me = createBattlesnake("me", [{ x: 2, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 0 }])
-  //     const gameState = createGameState(me)
-
-  //     // Act 1,000x (this isn't a great way to test, but it's okay for starting out)
-  //     for (let i = 0; i < 1000; i++) {
-  //       const moveResponse: MoveResponse = move(gameState)
-  //       // In this state, we should NEVER move left.
-  //       const allowedMoves = ["up", "down", "right"]
-  //       expect(allowedMoves).toContain(moveResponse.move)
-  //     }
-  //   })
-})
-
-describe('Battlesnake Possible Moves', () => {
+describe('Battlesnake avoids walls', () => {
   it('should not be able to turn left or down at origin corner', () => {
     const me = createBattlesnake(
       "me",
@@ -112,24 +96,9 @@ describe('Battlesnake Possible Moves', () => {
     expect(possibleMoves.up).toEqual(false)
   })
 
-  it('should not run into itself to the left', () => {
-    const me = createBattlesnake(
-      "me",
-      [
-        { x: 2, y: 2 },
-        { x: 1, y: 2 },
-        { x: 1, y: 1 }
-      ]
-    )
+})
 
-    const gameState = createGameState(me)
-    let possibleMoves = avoidWalls(gameState)
-    expect(possibleMoves.left).toEqual(true)
-
-    possibleMoves = avoidYourself(gameState, possibleMoves)
-    expect(possibleMoves.left).toEqual(false)
-  })
-
+describe('Battlesnake moves into open space', () => {
   it('should be able to go left if it is clear', () => {
     const me = createBattlesnake(
       "me",
@@ -148,23 +117,7 @@ describe('Battlesnake Possible Moves', () => {
     expect(possibleMoves.left).toEqual(true)
   })
 
-  it('should not run into itself to the right', () => {
-    const me = createBattlesnake(
-      "me",
-      [
-        { x: 2, y: 2 },
-        { x: 3, y: 2 },
-        { x: 3, y: 3 }
-      ]
-    )
 
-    const gameState = createGameState(me)
-    let possibleMoves = avoidWalls(gameState)
-    expect(possibleMoves.right).toEqual(true)
-
-    possibleMoves = avoidYourself(gameState, possibleMoves)
-    expect(possibleMoves.right).toEqual(false)
-  })
 
   it('should be able to go right if it is clear', () => {
     const me = createBattlesnake(
@@ -184,26 +137,7 @@ describe('Battlesnake Possible Moves', () => {
     expect(possibleMoves.right).toEqual(true)
   })
 
-  it('should not run into itself to the top', () => {
-    const me = createBattlesnake(
-      "me",
-      [
-        { x: 2, y: 2 },
-        { x: 1, y: 2 },
-        { x: 1, y: 3 },
-        { x: 2, y: 3 },
-      ]
 
-
-    )
-
-    const gameState = createGameState(me)
-    let possibleMoves = avoidWalls(gameState)
-    expect(possibleMoves.up).toEqual(true)
-
-    possibleMoves = avoidYourself(gameState, possibleMoves)
-    expect(possibleMoves.up).toEqual(false)
-  })
 
   it('should be able to go up if it is clear', () => {
     const me = createBattlesnake(
@@ -221,25 +155,6 @@ describe('Battlesnake Possible Moves', () => {
 
     possibleMoves = avoidYourself(gameState, possibleMoves)
     expect(possibleMoves.up).toEqual(true)
-  })
-
-  it('should not run into itself to the bottom', () => {
-    const me = createBattlesnake(
-      "me",
-      [
-        { x: 2, y: 2 },
-        { x: 1, y: 2 },
-        { x: 1, y: 1 },
-        { x: 2, y: 1 },
-      ]
-    )
-
-    const gameState = createGameState(me)
-    let possibleMoves = avoidWalls(gameState)
-    expect(possibleMoves.down).toEqual(true)
-
-    possibleMoves = avoidYourself(gameState, possibleMoves)
-    expect(possibleMoves.down).toEqual(false)
   })
 
   it('should be able to go down if it is clear', () => {
@@ -260,4 +175,213 @@ describe('Battlesnake Possible Moves', () => {
     possibleMoves = avoidYourself(gameState, possibleMoves)
     expect(possibleMoves.down).toEqual(true)
   })
+})
+
+describe('Battlesnake avoids itself', () => {
+  it('should not run into itself to the bottom', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 1, y: 2 },
+        { x: 1, y: 1 },
+        { x: 2, y: 1 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.down).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.down).toEqual(false)
+  })
+
+  it('should not run into itself to the top', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 1, y: 2 },
+        { x: 1, y: 3 },
+        { x: 2, y: 3 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.up).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.up).toEqual(false)
+  })
+
+  it('should not run into itself to the right', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 3, y: 2 },
+        { x: 3, y: 3 }
+      ]
+    )
+
+    const gameState = createGameState(me)
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.right).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.right).toEqual(false)
+  })
+
+  it('should not run into itself to the left', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 1, y: 2 },
+        { x: 1, y: 1 }
+      ]
+    )
+
+    const gameState = createGameState(me)
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.left).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.left).toEqual(false)
+  })
+})
+
+describe('Battlesnake avoids other snakes', () => {
+  it('should not run into snake while moving up', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 2, y: 1 },
+        { x: 2, y: 0 }
+      ]
+    )
+
+    const blocker = createBattlesnake(
+      "me",
+      [
+        { x: 1, y: 3 },
+        { x: 2, y: 3 },
+        { x: 3, y: 3 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    gameState.board.snakes = [me, blocker]
+
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.up).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.up).toEqual(true)
+
+    possibleMoves = avoidOthers(gameState, possibleMoves)
+    expect(possibleMoves.up).toEqual(false)
+  })
+
+  it('should not run into snake while moving down', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 2, y: 3 },
+        { x: 2, y: 4 }
+      ]
+    )
+
+    const blocker = createBattlesnake(
+      "me",
+      [
+        { x: 1, y: 1 },
+        { x: 2, y: 1 },
+        { x: 3, y: 1 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    gameState.board.snakes = [me, blocker]
+
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.down).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.down).toEqual(true)
+
+    possibleMoves = avoidOthers(gameState, possibleMoves)
+    expect(possibleMoves.down).toEqual(false)
+  })
+
+  it('should not run into snake while moving left', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 3, y: 2 },
+        { x: 4, y: 2 }
+      ]
+    )
+
+    const blocker = createBattlesnake(
+      "me",
+      [
+        { x: 1, y: 1 },
+        { x: 1, y: 2 },
+        { x: 1, y: 3 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    gameState.board.snakes = [me, blocker]
+
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.left).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.left).toEqual(true)
+
+    possibleMoves = avoidOthers(gameState, possibleMoves)
+    expect(possibleMoves.left).toEqual(false)
+  })
+
+  it('should not run into snake while moving right', () => {
+    const me = createBattlesnake(
+      "me",
+      [
+        { x: 2, y: 2 },
+        { x: 1, y: 2 },
+        { x: 0, y: 2 }
+      ]
+    )
+
+    const blocker = createBattlesnake(
+      "me",
+      [
+        { x: 3, y: 1 },
+        { x: 3, y: 2 },
+        { x: 3, y: 3 },
+      ]
+    )
+
+    const gameState = createGameState(me)
+    gameState.board.snakes = [me, blocker]
+
+    let possibleMoves = avoidWalls(gameState)
+    expect(possibleMoves.right).toEqual(true)
+
+    possibleMoves = avoidYourself(gameState, possibleMoves)
+    expect(possibleMoves.right).toEqual(true)
+
+    possibleMoves = avoidOthers(gameState, possibleMoves)
+    expect(possibleMoves.right).toEqual(false)
+  })
+})
+
+describe('Battlesnake moves toward food', () => {
 })

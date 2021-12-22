@@ -1,4 +1,5 @@
 import { InfoResponse, GameState, MoveResponse, Game, Coord } from "./types"
+import { coordDown, coordLeft, coordRight, coordUp } from "./typeLogic"
 
 export function info(): InfoResponse {
   console.log("INFO")
@@ -113,32 +114,69 @@ export function avoidWalls(gameState: GameState): { [key: string]: boolean } {
 export function avoidYourself(gameState: GameState, possibleMoves: { [key: string]: boolean }): { [key: string]: boolean } {
   const { head, body } = gameState.you
   if (possibleMoves.up) {
-    const topCoord: Coord = { x: head.x, y: head.y + 1 }
+    const topCoord: Coord = coordUp(head)
     if (coordinateIsOccupied(topCoord, body)) {
       possibleMoves.up = false
     }
   }
 
   if (possibleMoves.down) {
-    const bottomCoord: Coord = { x: head.x, y: head.y - 1 }
+    const bottomCoord: Coord = coordDown(head)
     if (coordinateIsOccupied(bottomCoord, body)) {
       possibleMoves.down = false
     }
   }
 
   if (possibleMoves.left) {
-    const leftCoord: Coord = { x: head.x - 1, y: head.y }
+    const leftCoord: Coord = coordLeft(head)
     if (coordinateIsOccupied(leftCoord, body)) {
       possibleMoves.left = false
     }
   }
 
   if (possibleMoves.right) {
-    const rightCoord: Coord = { x: head.x + 1, y: head.y }
+    const rightCoord: Coord = coordRight(head)
     if (coordinateIsOccupied(rightCoord, body)) {
       possibleMoves.right = false
     }
   }
+  return possibleMoves
+}
+
+export function avoidOthers(gameState: GameState, possibleMoves: { [key: string]: boolean }): { [key: string]: boolean } {
+  const { head } = gameState.you
+  const { snakes } = gameState.board
+
+  let coords = snakes.flatMap(snake => snake.body)
+
+  if (possibleMoves.up) {
+    const coord = coordUp(head)
+    if (coordinateIsOccupied(coord, coords)) {
+      possibleMoves.up = false
+    }
+  }
+
+  if (possibleMoves.down) {
+    const coord = coordDown(head)
+    if (coordinateIsOccupied(coord, coords)) {
+      possibleMoves.down = false
+    }
+  }
+
+  if (possibleMoves.left) {
+    const coord = coordLeft(head)
+    if (coordinateIsOccupied(coord, coords)) {
+      possibleMoves.left = false
+    }
+  }
+
+  if (possibleMoves.right) {
+    const coord = coordRight(head)
+    if (coordinateIsOccupied(coord, coords)) {
+      possibleMoves.right = false
+    }
+  }
+
   return possibleMoves
 }
 
